@@ -1,11 +1,11 @@
 export type IReaction = {
-  userID: string;
+  userID: number;
   emoji?: string;
 }
 
 export type MessageDataType = {
-  senderID: string,
-  receiverID: string,
+  senderID: number,
+  receiverID: number,
   conversationID: string,
   reactions: Array<IReaction>,
   content: string,
@@ -16,8 +16,8 @@ type MessageStatus = "sent" | "sending" | "delivered" | "seen" | "invalid";
 type ContentType = "text" | "image" | "video" | "file" | "audio";
 
 export type IMessage = {
-  senderID: string;
-  receiverID: string;
+  senderID: number;
+  receiverID: number;
   conversationID: string;
   content: string;
   contentType: ContentType;

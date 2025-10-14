@@ -43,7 +43,7 @@ describe("UserTransaction", () => {
 
     describe("signupCredential", () => {
         it("should successfully insert a new user and return the insertId", async () => {
-            const username = "testuser";
+            const email = "testuser";
             const hashedPassword = "hashedpassword";
             const insertId = 123;
 
@@ -53,14 +53,14 @@ describe("UserTransaction", () => {
                 [],
             ]);
 
-            const result = await userTransaction.signupCredential(username, hashedPassword);
+            const result = await userTransaction.signupCredential(email, hashedPassword);
 
             // Assert that the correct operations were performed
             expect(mockGetConnection).toHaveBeenCalledTimes(1);
             expect(mockBeginTransaction).toHaveBeenCalledTimes(1);
             expect(mockExecute).toHaveBeenCalledWith(
-                `INSERT INTO users_auth (username, password) VALUES (?, ?)`,
-                [username, hashedPassword]
+                `INSERT INTO users_auth (email, password) VALUES (?, ?)`,
+                [email, hashedPassword]
             );
             expect(mockCommit).toHaveBeenCalledTimes(1);
             expect(mockRollback).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe("UserTransaction", () => {
         });
 
         it("should rollback the transaction if the insert fails", async () => {
-            const username = "testuser";
+            const email = "testuser";
             const hashedPassword = "hashedpassword";
             const error = new Error("Database error");
 
@@ -77,7 +77,7 @@ describe("UserTransaction", () => {
             mockExecute.mockRejectedValueOnce(error);
 
             // Expect the method to throw the same error
-            await expect(userTransaction.signupCredential(username, hashedPassword)).rejects.toThrow(error);
+            await expect(userTransaction.signupCredential(email, hashedPassword)).rejects.toThrow(error);
 
             // Assert that the correct operations were performed for a failed transaction
             expect(mockBeginTransaction).toHaveBeenCalledTimes(1);

@@ -111,12 +111,12 @@
 //   });
 
 //   test("loginController should return ApiResponse on valid login", async () => {
-//     const authData = { username: "drin@gmail.com", password: "@#@#aldrin" };
+//     const authData = { email: "drin@gmail.com", password: "@#@#aldrin" };
 
 //     const fakeAuth: UserAuthFull = {
 //       created_at: "2025-08-19T12:00:00Z",
 //       user_id: 1,
-//       username: "drin@gmail.com",
+//       email: "drin@gmail.com",
 //       password: "securePass123",
 //       firstName: "John",
 //       lastName: "Doe",
@@ -143,7 +143,7 @@
 
 
 //   test("loginController should throw if authentication fails", async () => {
-//     const authData = { username: "user", password: "wrongpass" };
+//     const authData = { email: "user", password: "wrongpass" };
 //     mockCompareEncryptedPassword.mockResolvedValueOnce(null);
 //     await expect(userController.loginController(authData)).rejects.toThrow("Invalid Login!");
 //   });

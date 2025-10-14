@@ -1,5 +1,5 @@
 export type Participant = {
-    userID: string | number,
+    userID: number,
     firstName: string,
     lastName: string,
     nickname: string,
@@ -7,7 +7,7 @@ export type Participant = {
 }
 
 export type Conversation = {
-    userID: string,
+    userID: number,
     participant: Array<Participant>,
     contactID: string,
     _id?: boolean

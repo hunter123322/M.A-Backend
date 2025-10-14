@@ -1,18 +1,24 @@
 import { Request, Response } from "express";
+import type { JWTPayload } from "../../types/jtw.payload.type";
 
-export async function apiAuthCheck(req: Request, res: Response) {
-    try {
-        const auth = (req.session as { user_id?: number }).user_id;
-        if (auth) {
-            // ✅ verify session from DB or memory (example check only)
-            res.status(200).json({ loggedIn: true });
-            return
-        }
-        console.log(auth, 123456578);
+type AuthRequest<T = any> = Request<unknown, unknown, T> & {
+  user?: JWTPayload;
+};
 
-        res.status(401).json({ loggedIn: false });
-    } catch (error) {
-        console.error("Auth check error:", error);
-        res.status(500).json({ loggedIn: false, error: "Server error" });
+// Check if user is authenticated - CONVERTED TO JWT
+export async function apiAuthCheck(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    if (req.user?.user_id) {
+      res.status(200).json({
+        message: "Authenticated",
+        user: req.user,
+      });
+      return;
     }
+
+    res.status(401).json({ loggedIn: false });
+  } catch (error) {
+    console.error("Auth check error:", error);
+    res.status(500).json({ loggedIn: false, error: "Server error" });
+  }
 }

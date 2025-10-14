@@ -1,7 +1,7 @@
 import { ContactList } from "../../types/contact.list.type";
 import { Contact } from "../contact/contact.list.model";
-import Message from "../messages.model";
-import type { IMessageDocument } from "../messages.model"
+import { Message } from "../message/messages.model";
+import type { IMessageDocument } from "../message/messages.model"
 import { ConversationList } from "../conversation/conversation.model";
 import { Conversation } from "../../types/conversation.list.type";
 

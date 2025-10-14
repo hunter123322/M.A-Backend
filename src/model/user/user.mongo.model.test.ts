@@ -1,6 +1,6 @@
 import { test, describe, expect, mock, beforeEach } from "bun:test";
 import * as messageService from "./user.mongo.model"; // replace with actual path
-import type { IMessageDocument } from "../messages.model";
+import type { IMessageDocument } from "../message/messages.model";
 import type { ContactList } from "../../types/contact.list.type";
 import type { Conversation } from "../../types/conversation.list.type";
 

@@ -1,5 +1,5 @@
 import express from "express";
-import isAuthenticated from "../middleware/authentication.js";
+import { authenticateToken } from "../middleware/authentication.js";
 import { postLogin } from "../controller/auth/login.controller.js";
 import { logout } from "../controller/auth/logout.controller.js";
 import { postInformation } from "../controller/signup/step2/information.controller.js";
@@ -8,6 +8,10 @@ import { postSignup } from "../controller/signup/step1/signup.controller.js";
 import { apiAuthCheck } from "../controller/auth/api.auth.check.controller.js";
 import { searchContact } from "../controller/contact/search.contact.controller.js";
 import { createContact } from "../controller/contact/create.contact.controller.js";
+import { initProfile } from "../controller/profile/profile.init.controller.js";
+import { PostController } from "../controller/post/post.controller.js";
+import { CommentController } from "../controller/post/comment.controller.js";
+import { LikeController } from "../controller/post/like.controller.js";
 
 const router = express.Router();
 
@@ -15,20 +19,30 @@ const router = express.Router();
 
 // Login/Logout
 router.post("/login", postLogin);
-
-router.post("/logout", isAuthenticated, logout);
+router.post("/logout", authenticateToken, logout);
 
 router.post("/signup", postSignup);
+router.post("/signup/information", authenticateToken, postInformation);
+router.post("/signup/location", authenticateToken, postLocation);
 
-router.post("/signup/information", isAuthenticated, postInformation);
+router.get('/apiAuthCheck', authenticateToken, apiAuthCheck)
+router.get("/contact/search", searchContact);
+router.post("/contact/create", authenticateToken, createContact);
+router.get("/user/profile/init", authenticateToken, initProfile)
 
-router.post("/signup/location", isAuthenticated, postLocation);
+router.get("/posts/:id", authenticateToken, PostController.getById);
+router.get("/posts/timestamp", authenticateToken, PostController.getByTimestamp);
+router.post("/post/create", authenticateToken, PostController.create)
+router.put("/post/update", authenticateToken, PostController.update)
+router.delete("/post/delete", authenticateToken, PostController.delete)
 
-router.get('/apiAuthCheck', apiAuthCheck)
+router.get("/post/comment/get", authenticateToken, CommentController.get)
+router.get("/post/comment/getMore", authenticateToken, CommentController.loadMoreComment)
+router.post("/post/comment/create", authenticateToken, CommentController.create)
+router.delete("/post/comment/delete", authenticateToken, CommentController.delete)
 
-router.get("/contact/search", isAuthenticated, searchContact);
-
-router.get("/contact/create", isAuthenticated, createContact);
+router.post("/post/like", authenticateToken, LikeController.like)
+router.delete("/post/unlike", authenticateToken, LikeController.unlike)
 
 
 
@@ -42,4 +56,5 @@ router.get("/", (req, res) => {
     }
     console.log(req.session, req.sessionID);           // print all headers
 })
+
 export default router;

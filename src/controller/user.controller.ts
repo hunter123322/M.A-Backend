@@ -3,7 +3,7 @@ import passwordController from "../service/auth/password.service";
 import mySQLConnectionPool from "../db/mysql/mysql.connection-pool";
 import userSignupValidation from "../validation/user.signup.validation";
 import { UserModel } from "../model/user/user.model";
-import { IMessageDocument } from "../model/messages.model";
+import { IMessageDocument } from "../model/message/messages.model";
 import type { UserInfo, UserLocation, UserAut } from "../types/User.type";
 import { Contact } from "../model/contact/contact.list.model";
 import { ConversationList } from "../model/conversation/conversation.model";
@@ -27,9 +27,9 @@ export class UserController {
     this.transaction = new UserTransaction(this.SQLconnection);
   }
 
-  public async signController(username: string, password: string): Promise<number> {
+  public async signController(email: string, password: string, username: string): Promise<number> {
     const hashedPassword = await passwordController.passwordHasher(password);
-    return this.transaction.signupCredential(username, hashedPassword);
+    return this.transaction.signupCredential(email, hashedPassword, username);
   }
 
   public async userInformationController(data: UserInfo, user_id: number | undefined): Promise<void> {
@@ -46,8 +46,15 @@ export class UserController {
     await this.transaction.locationCredential(data, user_id);
   }
 
+  public async initProfile(userID: number) {
+    const userProfileData = await this.transaction.fetchUserProfile(userID);
+    // Fetch the user post data in MongoDB
+
+    return userProfileData
+  }
+
   public async loginController(data: UserAut): Promise<ApiResponse> {
-    const authentication = await passwordController.compareEncryptedPassword(data.username, data.password);
+    const authentication = await passwordController.compareEncryptedPassword(data.email, data.password);
     if (!authentication) {
       throw new Error("Invalid Login!");
     }

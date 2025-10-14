@@ -1,4 +1,4 @@
-import { IMessageDocument } from "../messages.model"
+import { IMessageDocument } from "../message/messages.model"
 import { Pool, PoolConnection } from 'mysql2/promise';
 import { initMessage } from "./user.mongo.model";
 import { initUserInfo } from "./user.sql.model";

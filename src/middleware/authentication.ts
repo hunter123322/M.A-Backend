@@ -1,18 +1,60 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { Socket } from "socket.io";
 
-async function isAuthenticated(req: Request, res: Response, next: NextFunction): Promise<any> {
-  try {
-    // Check if the session has the `username` field set
-    if (req.session && (req.session as { user_id?: string }).user_id) {
-      return next(); // Proceed to the next middleware or route handler
-    }
 
-    // If no username is found, send a 401 Unauthorized error
-    return res.status(401).json({ message: "Unauthorized - Please login first" });
-  } catch (error) {
-    console.error("Authentication Error: ", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
+const JWT_EXPIRES_IN = "24h";
+
+interface JWTPayload {
+  user_id: number;
+  email: string;
 }
 
-export default isAuthenticated;
+interface AuthRequest extends Request {
+  user?: JWTPayload;
+}
+
+export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+  if (!token) {
+    res.status(401).json({ message: "Access token required" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(403).json({ message: "Invalid or expired token" });
+  }
+};
+
+export const generateToken = (payload: JWTPayload): string => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+};
+
+
+export const authenticateTokenSocket = (
+  socket: Socket,
+  next: (err?: Error) => void
+): void => {
+  const token =
+    (socket.handshake.auth?.token as string) ||
+    (socket.handshake.headers?.authorization?.split(" ")[1] as string);
+
+  if (!token) {
+    return next(new Error("Authentication error: token required"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
+    (socket as any).user = decoded; // Attach user payload
+    next();
+  } catch (error) {
+    return next(new Error("Authentication error: invalid token"));
+  }
+};

@@ -77,7 +77,7 @@ describe("User Authentication Services", () => {
   describe("> compareEncryptedPassword", () => {
     const sampleUserAuth: UserAut = {
       user_id: 100,
-      username: "drin@gmail.com",
+      email: "drin@gmail.com",
       password: "$2a$10$someFakeHashForTesting1234567890", // <-- fake bcrypt hash
       created_at: "2024-01-01T00:00:00Z",
     };
@@ -103,7 +103,7 @@ describe("User Authentication Services", () => {
 
       expect(mockGetConnection).toHaveBeenCalledTimes(1);
       expect(mockQuery).toHaveBeenCalledWith(
-        "SELECT * FROM users_auth WHERE username = ?",
+        "SELECT * FROM users_auth WHERE email = ?",
         ["drin@gmail.com"]
       );
       expect(mockBcryptCompare).toHaveBeenCalledWith(
@@ -116,12 +116,12 @@ describe("User Authentication Services", () => {
     });
 
 
-    it("should throw 'Username not found!' when user doesn't exist", async () => {
+    it("should throw 'email not found!' when user doesn't exist", async () => {
       mockQuery.mockResolvedValueOnce([[], []] as [RowDataPacket[], any]);
 
       await expect(
         compareEncryptedPassword("nonexistent", "anypassword")
-      ).rejects.toThrow("Username not found!");
+      ).rejects.toThrow("email not found!");
 
       expect(mockRelease).toHaveBeenCalledTimes(1);
       expect(mockBcryptCompare).not.toHaveBeenCalled();
@@ -139,17 +139,17 @@ describe("User Authentication Services", () => {
       expect(mockRelease).toHaveBeenCalledTimes(1);
     });
 
-    it("should handle empty username or password", async () => {
-      // Test empty username
+    it("should handle empty email or password", async () => {
+      // Test empty email
       mockQuery.mockResolvedValueOnce([[], []] as [RowDataPacket[], any]);
       await expect(
         compareEncryptedPassword("", "password")
-      ).rejects.toThrow("Username not found!");
+      ).rejects.toThrow("email not found!");
 
       // Test empty password
       mockQuery.mockResolvedValueOnce([[sampleUserAuth], []] as [RowDataPacket[], any]);
       await expect(
-        compareEncryptedPassword("username", "")
+        compareEncryptedPassword("email", "")
       ).rejects.toThrow("Incorrect password!");
 
       expect(mockRelease).toHaveBeenCalledTimes(2);

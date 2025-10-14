@@ -5,8 +5,7 @@ export async function contactInit(userID: number) {
     try {
         const contactQuery = await Contact.findOne({ userID: userID });
         const contactList = contactQuery?.conversationID as string[];
-        const contactListInfo = await ConversationList.find();
-        console.log(2222, contactQuery, 3333, contactList, 4444, contactListInfo);
+        const contactListInfo = await ConversationList.find({_id: contactList});
         
         return contactListInfo;
     } catch (error: any) {

@@ -7,7 +7,7 @@ import {
     messageReaction,
     deleteMessage,
 } from "./message.event";
-import Message from "../../model/messages.model"; // Assuming this is your Mongoose model
+import { Message } from "../../model/message/messages.model"; // Assuming this is your Mongoose model
 import {
     getMessage,
     postMessage,

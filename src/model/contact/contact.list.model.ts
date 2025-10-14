@@ -3,12 +3,12 @@ import type { ContactList } from "../../types/contact.list.type";
 
 
 const contactListSchema = new Schema<ContactList>({
-    userID: { type: String, required: true, trim: true },
+    userID: { type: Number, required: true, trim: true, unique: true, index: true },
     conversationID: [{ type: String, required: true }],
 },
     {
-        timestamps: true, 
-        versionKey: false, 
+        timestamps: true,
+        versionKey: false,
         _id: false,
         collection: "contactList"
     }

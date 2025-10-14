@@ -4,7 +4,9 @@ import { RowDataPacket } from 'mysql2/promise';
 import { UserModel } from "../../model/user/user.model.js";
 import type { UserAut, UserInfo } from "../../types/User.type.js";
 
-type UserAuthFull = UserAut & UserInfo;
+type UserAuthFull = UserAut & UserInfo & {
+  username: string
+};
 
 async function passwordHasher(password: string): Promise<string> {
   if (typeof password !== "string") {
@@ -26,19 +28,19 @@ async function passwordHasher(password: string): Promise<string> {
 
 
 async function compareEncryptedPassword(
-  username: string,
+  email: string,
   password: string
 ): Promise<UserAuthFull> {
   const connection = await mySQLConnectionPool.getConnection();
   const initUserInfo = new UserModel(mySQLConnectionPool);
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      "SELECT * FROM users_auth WHERE username = ?",
-      [username]
+      "SELECT * FROM users_auth WHERE email = ?",
+      [email]
     );
 
     if (!rows || rows.length === 0) {
-      throw new Error("Username not found!");
+      throw new Error("email not found!");
     }
 
     const user = rows[0] as UserAut;
@@ -55,7 +57,6 @@ async function compareEncryptedPassword(
 
     return returnValue;
   } catch (error) {
-    await connection.rollback();
     throw error;
   } finally {
     connection.release();

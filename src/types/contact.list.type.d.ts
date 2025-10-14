@@ -1,4 +1,4 @@
 export type ContactList = {
-    userID?: string,
+    userID?: number,
     conversationID: string[];
 }

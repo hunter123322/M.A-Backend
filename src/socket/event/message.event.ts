@@ -1,19 +1,19 @@
 import { Server, Socket } from "socket.io";
 import { getMessage, postMessage } from "../../service/message/message.socket.service";
-import Message from "../../model/messages.model";
+import { Message } from "../../model/message/messages.model";
 import type { MessageDataType } from "../../types/message.type";
 import type { IMessage } from "../../types/message.type";
 
 type EditMessage = { messageId: string, editedMessage: string };
 type NotificationPayload = {
     conversationID: string;
-    senderID: string;
+    senderID: number;
     preview: string;
     timestamp: Date;
 };
 type ReactionData = {
     messageReaction: string,
-    userID: string,
+    userID: number,
     messageID: string,
 }
 type DeleteMessage = {

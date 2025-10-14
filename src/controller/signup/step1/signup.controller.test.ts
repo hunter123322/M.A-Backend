@@ -19,7 +19,7 @@ describe("postSignup", () => {
         console.error = mock();
 
         req = {
-            body: { username: "testuser", password: "pass123" },
+            body: { email: "testuser", password: "pass123" },
             session: {},
         };
 

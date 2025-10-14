@@ -1,4 +1,4 @@
-import Message from "../../model/messages.model";
+import { Message } from "../../model/message/messages.model";
 import { randomUUID } from "crypto";
 import { MessageDataType, IReaction } from "../../types/message.type";
 
@@ -17,7 +17,7 @@ export async function getMessage(convoID: string, lastTimestamp: any): Promise<a
         };
 
         if (!lastTimestamp) {
-            query = {conversationID: convoID}
+            query = { conversationID: convoID }
         }
 
         console.log(query);
@@ -36,9 +36,9 @@ export async function getMessage(convoID: string, lastTimestamp: any): Promise<a
 
 
 export async function postMessage(
-    content: String,
-    sender: String,
-    reciever: String,
+    content: string,
+    sender: number,
+    reciever: number,
     reactions: Array<IReaction>,
     conversationId?: String
 ): Promise<MessageDataType> {
