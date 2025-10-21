@@ -7,8 +7,8 @@ export type CommentType = {
     text: string;
     likes: number;
     author: User;
-    showReply?: boolean; 
     mentions?: User[];
+    commentCount: number;
     createdAt?: string;
     updatedAt?: string;
 };

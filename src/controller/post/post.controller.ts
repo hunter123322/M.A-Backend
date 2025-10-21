@@ -56,22 +56,42 @@ export class PostController {
     static async create(req: AuthRequest, res: Response): Promise<void> {
         try {
             const user_id = req.user?.user_id;
-            const postData = req.body as PostData[];
-        console.log("post called", postData);
+            const postData = req.body as PostData;
 
             if (!user_id) {
                 res.status(401).json({ message: "Unauthorized" });
                 return;
             }
 
-            if (!Array.isArray(postData) || postData.length === 0) {
+            if (!postData) {
                 res.status(400).json({ message: "Invalid post data" });
                 return;
             }
 
             const postDone = await Post.create(postData);
-            console.log("post done");
-            res.status(201).json({ message: "Post(s) created successfully" });
+            res.status(201).json(postDone);
+        } catch (error: any) {
+            res.status(500).json({ message: "Failed to create post" });
+        }
+    }
+
+    static async share(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const user_id = req.user?.user_id;
+            const postData = req.body as PostData;
+
+            if (!user_id) {
+                res.status(401).json({ message: "Unauthorized" });
+                return;
+            }
+
+            if (!postData) {
+                res.status(400).json({ message: "Invalid post data" });
+                return;
+            }
+
+            const postDone = await Post.share(postData);
+            res.status(201).json(postDone);
         } catch (error: any) {
             res.status(500).json({ message: "Failed to create post" });
         }

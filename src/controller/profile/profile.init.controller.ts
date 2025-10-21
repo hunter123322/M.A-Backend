@@ -14,8 +14,8 @@ export async function initProfile(req: AuthRequest, res: Response): Promise<void
         const user_id = req.user?.user_id;
         if (!user_id) throw new Error();
 
-        const userProfile = await User.initProfile(user_id)
-        res.status(200).json({ userProfile: userProfile })
+        const {userProfileData, myPosts} = await User.initProfile(user_id)
+        res.status(200).json({ userProfile: userProfileData, myPosts: myPosts })
     } catch (error) {
         console.error("Init profile Error:", error);
         res.status(500).json({ message: "Init profile Error" });

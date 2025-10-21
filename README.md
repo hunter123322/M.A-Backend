@@ -59,27 +59,6 @@ This project is built not just to function as a chat app, but as a learning plat
 
 ## 📁 Project Structure (Simplified)
 
----
-
-## 📸 Screenshot
-
-- **This what UI must look like**
-
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202024-12-05%20135720.png?raw=true)
-
-- **This is action must look like**
-
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202024-12-05%20135756.png)
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202024-12-05%20135813.png)
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202024-12-05%20135831.png)
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202024-12-05%20135901.png)
-
----
-
-- **Flowchart**
-
-![App Screenshot](https://github.com/hunter123322/typescript-try/blob/handling-offline-send-message/screenshot/Screenshot%202025-06-23%20164322.png)
-
 
 - **Refactor the root file** 
 - src/

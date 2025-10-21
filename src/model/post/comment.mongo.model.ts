@@ -10,7 +10,7 @@ const commentSchema = new Schema<CommentMongoDoc>({
     text: { type: String, required: true },          // required string
     likes: { type: Number, required: true, default: 0 },  // number with default 0
     author: { type: userSubSchema, required: true },    // embedded user document (or you can use ref)
-    showReply: { type: Boolean, required: false },   // optional boolean
+    commentCount: { type: Number, required: true, default: 0 },
     mentions: { type: [userSubSchema], required: false, default: [] } // array of users mentioned
 }, { timestamps: true, versionKey: false });
 

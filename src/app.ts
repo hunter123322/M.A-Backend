@@ -29,17 +29,17 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
-    credentials: true, // ✅ must allow credentials if frontend uses them
+    credentials: true,
   })
 );
 
 
 // ================== SOCKET.IO ==================
-const io = new SocketIOServer(server, {
+export const io = new SocketIOServer(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
-    credentials: true, // ✅ allow credentials for sockets too
+    credentials: true,
   },
 });
 

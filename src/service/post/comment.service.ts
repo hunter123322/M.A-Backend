@@ -1,16 +1,41 @@
+import { io } from "../../app";
 import { CommentModel } from "../../model/post/comment.mongo.model";
+import { PostModel } from "../../model/post/post.mongo.model";
+import { sendNotification } from "../../socket/event/message.event";
 import type { CommentType } from "../../types/post/comment.type";
-
+import { NotificationService } from "../notification/notification.service";
 export class Comment {
-    static async create(commentData: CommentType[]): Promise<void> {
-        if (!Array.isArray(commentData) || commentData.length === 0) {
-            throw new Error("Invalid comment data");
-        }
+    static async create(commentData: CommentType): Promise<CommentType | undefined> {
         try {
-            const result = await CommentModel.insertMany(commentData, { ordered: false });
-            if (!result || result.length === 0) {
+            if (!commentData) throw new Error("Retry the comment!")
+            const data = await CommentModel.insertOne(commentData);
+            if (!data) {
                 throw new Error("Failed to create comment(s)");
             }
+
+            // Increment commentCount by 1
+            const updatedPostDOc = await PostModel.findByIdAndUpdate(
+                data.postID, { $inc: { commentCount: 1 } }, { new: true }
+            );
+            if (!updatedPostDOc || !updatedPostDOc.author || !updatedPostDOc.author.id) {
+                throw new Error("Updated post not found or missing author — skipping notification");
+            }
+            if (updatedPostDOc.author.id === commentData.author.id) {
+                console.info("User liked their own post — skipping notification");
+                return;
+            }
+
+            const notificationData = {
+                userID: updatedPostDOc.author.id,
+                engagementID: updatedPostDOc._id,
+                categories: "like" as "like",
+                content: "",
+                read: false
+            };
+
+            const newNotification = await NotificationService.create(notificationData);
+
+            sendNotification(io, notificationData.userID, newNotification)
         } catch (error: any) {
             throw new Error("Failed to create comment(s)");
         }
@@ -30,23 +55,28 @@ export class Comment {
         }
     }
 
-    static async getByPost(postID: string, lastCommentTimestamp?: Date): Promise<CommentType[]> {
+    static async getByPost(postID: string, lastCommentTimestamp?: string): Promise<CommentType[]> {
         if (!postID) {
             throw new Error("Post ID is required");
         }
+
         try {
+            const query: any = { postID };
+
             if (lastCommentTimestamp) {
-                const comments: CommentType[] = await CommentModel.find({
-                    postID: postID,
-                    createdAt: { $gt: new Date(lastCommentTimestamp) }
-                }).sort({ createdAt: -1 }).limit(5);
-                
-                return comments
+                query.createdAt = { $lt: new Date(lastCommentTimestamp) }; // ✅ older than the last loaded
             }
-            const comments: CommentType[] = await CommentModel.find({ postID }).sort({ createdAt: -1 }).limit(5);
+
+            const comments: CommentType[] = await CommentModel.find(query)
+                .sort({ createdAt: -1 }) // newest first
+                .limit(5);
+
+            console.log(comments);
             return comments;
         } catch (error: any) {
+            console.error("Error in getByPost:", error);
             throw new Error("Failed to fetch comments");
         }
     }
+
 }

@@ -12,10 +12,9 @@ import { initProfile } from "../controller/profile/profile.init.controller.js";
 import { PostController } from "../controller/post/post.controller.js";
 import { CommentController } from "../controller/post/comment.controller.js";
 import { LikeController } from "../controller/post/like.controller.js";
+import { NotificationController } from "../controller/notification/notification.controller.js";
 
 const router = express.Router();
-
-// TODO - Add route for "/home" or "/M.A-Chat-App"
 
 // Login/Logout
 router.post("/login", postLogin);
@@ -33,6 +32,7 @@ router.get("/user/profile/init", authenticateToken, initProfile)
 router.get("/posts/:id", authenticateToken, PostController.getById);
 router.get("/posts/timestamp", authenticateToken, PostController.getByTimestamp);
 router.post("/post/create", authenticateToken, PostController.create)
+router.post("/post/share", authenticateToken, PostController.share)
 router.put("/post/update", authenticateToken, PostController.update)
 router.delete("/post/delete", authenticateToken, PostController.delete)
 
@@ -42,7 +42,9 @@ router.post("/post/comment/create", authenticateToken, CommentController.create)
 router.delete("/post/comment/delete", authenticateToken, CommentController.delete)
 
 router.post("/post/like", authenticateToken, LikeController.like)
-router.delete("/post/unlike", authenticateToken, LikeController.unlike)
+router.post("/post/unlike", authenticateToken, LikeController.unlike)
+
+router.get("/notification/init", authenticateToken, NotificationController.init)
 
 
 

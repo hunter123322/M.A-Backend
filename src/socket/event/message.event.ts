@@ -3,6 +3,7 @@ import { getMessage, postMessage } from "../../service/message/message.socket.se
 import { Message } from "../../model/message/messages.model";
 import type { MessageDataType } from "../../types/message.type";
 import type { IMessage } from "../../types/message.type";
+import { NotificationType } from "../../types/notificaton/notification.type";
 
 type EditMessage = { messageId: string, editedMessage: string };
 type NotificationPayload = {
@@ -132,4 +133,8 @@ export function deleteMessage(socket: Socket, io: Server) {
 
         io.to(conversationID as string).emit("deleteMessage", message.messageId);
     });
+}
+
+export function sendNotification(io: Server, userID: number, data: NotificationType) {
+    io.to(`user:${userID}`).emit("Notification", data)
 }

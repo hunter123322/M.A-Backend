@@ -7,6 +7,7 @@ import { IMessageDocument } from "../model/message/messages.model";
 import type { UserInfo, UserLocation, UserAut } from "../types/User.type";
 import { Contact } from "../model/contact/contact.list.model";
 import { ConversationList } from "../model/conversation/conversation.model";
+import Post from "../service/post/post.service";
 
 const user = new UserModel(mySQLConnectionPool);
 
@@ -48,9 +49,11 @@ export class UserController {
 
   public async initProfile(userID: number) {
     const userProfileData = await this.transaction.fetchUserProfile(userID);
-    // Fetch the user post data in MongoDB
 
-    return userProfileData
+    // Fetch the user post data in MongoDB
+    const myPosts = await Post.findByUser(userID)
+
+    return {userProfileData, myPosts}
   }
 
   public async loginController(data: UserAut): Promise<ApiResponse> {

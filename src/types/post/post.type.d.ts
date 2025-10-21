@@ -9,10 +9,7 @@ export type PostData = {
     likes: number;
     shared?: {
         isSharedPost: boolean;
-        id: string;
-        author: User;
-        sharedAt?: string;
-        shareCount?: number;
+        post: string;
     };
     tags?: string[];
     aiScore?: Record<string, number>;

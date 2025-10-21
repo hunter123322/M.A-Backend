@@ -24,7 +24,7 @@ async function postLogin(req: Request, res: Response): Promise<void> {
     const author = {
       id: data.user_id,
       username: data.authentication.username,
-      avatarUrl: userProfile.user_avatar
+      avatarUrl: userProfile.userProfileData.user_avatar
     }
 
     const token = generateToken({

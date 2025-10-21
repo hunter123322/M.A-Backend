@@ -7,13 +7,10 @@ type LikeMongoDoc = LikeData & Document & {}
 const likeSchema = new Schema<LikeMongoDoc>({
     user: { type: userSubSchema, required: true },
     postID: { type: String, required: true, index: true }
-}, { timestamps: true, _id: false, versionKey: false });
+}, { timestamps: true, versionKey: false });
 
 export const LikeModel: Model<LikeMongoDoc> =
     mongoose.models.Like || mongoose.model<LikeMongoDoc>("Like", likeSchema);
-
-
-
 
 
     

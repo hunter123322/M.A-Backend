@@ -21,10 +21,7 @@ const postSchema = new Schema<PostMongoDoc>(
         likes: { type: Number, default: 0, min: 0 },
         shared: {
             isSharedPost: { type: Boolean, default: false },
-            id: { type: String, trim: true },
-            author: userSubSchema,
-            sharedAt: { type: String, default: null },
-            shareCount: { type: Number, default: 0, min: 0 },
+            post: { type: Schema.Types.ObjectId, ref: "Post" },
         },
         type: {
             type: String,
