@@ -4,10 +4,9 @@ import mySQLConnectionPool from "../db/mysql/mysql.connection-pool";
 import userSignupValidation from "../validation/user.signup.validation";
 import { UserModel } from "../model/user/user.model";
 import { IMessageDocument } from "../model/message/messages.model";
-import type { UserInfo, UserLocation, UserAut } from "../types/User.type";
-import { Contact } from "../model/contact/contact.list.model";
-import { ConversationList } from "../model/conversation/conversation.model";
+import type { UserInfo, UserLocation, UserAut, UserProfile } from "../types/User.type";
 import Post from "../service/post/post.service";
+import { isTypedArray } from "util/types";
 
 const user = new UserModel(mySQLConnectionPool);
 
@@ -48,12 +47,12 @@ export class UserController {
   }
 
   public async initProfile(userID: number) {
-    const userProfileData = await this.transaction.fetchUserProfile(userID);
+    const userProfileData = await this.transaction.fetchUserProfile(userID) as UserProfile;
 
     // Fetch the user post data in MongoDB
     const myPosts = await Post.findByUser(userID)
 
-    return {userProfileData, myPosts}
+    return { userProfileData, myPosts }
   }
 
   public async loginController(data: UserAut): Promise<ApiResponse> {

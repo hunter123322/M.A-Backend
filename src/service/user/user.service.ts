@@ -107,23 +107,37 @@ export class UserTransaction {
         });
     }
 
-    public async fetchUserProfile(userID: number) {
-        const connection = await mySQLConnectionPool.getConnection()
+    public async fetchUserProfile(filter: number | string, search: boolean = false) {
+        const connection = await mySQLConnectionPool.getConnection();
         try {
-            // Fetch the user profile data in MySQL
-            const [rows] = await connection.query<RowDataPacket[]>(
-                "SELECT * FROM users_profile WHERE user_id = ?",
-                [userID]
-            )
+            let query: string;
+            let params: (string | number)[];
+
+            if (search) {
+                // Use LIKE for partial nickname match
+                query = "SELECT * FROM users_profile WHERE user_nickname LIKE ?";
+                params = [`%${filter}%`];
+            } else {
+                // Default: exact match by user_id
+                query = "SELECT * FROM users_profile WHERE user_id = ?";
+                params = [filter];
+            }
+
+            const [rows] = await connection.query<RowDataPacket[]>(query, params);
+
             if (!rows || rows.length === 0) {
                 throw new Error("User profile not found!");
             }
-            const profileData = rows[0]
-            return profileData as UserProfile
+
+            // If search mode, return all matching users; otherwise, return single
+            return search ? (rows as UserProfile[]) : (rows[0] as UserProfile);
         } catch (error) {
             throw error;
         } finally {
-            connection.release()
+            connection.release();
         }
     }
 }
+
+// const a = new UserTransaction(mySQLConnectionPool)
+// console.log(await a.fetchUserProfile("A", true));

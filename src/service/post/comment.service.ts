@@ -22,7 +22,7 @@ export class Comment {
             }
             if (updatedPostDOc.author.id === commentData.author.id) {
                 console.info("User liked their own post — skipping notification");
-                return;
+                return data;
             }
 
             const notificationData = {
@@ -36,6 +36,9 @@ export class Comment {
             const newNotification = await NotificationService.create(notificationData);
 
             sendNotification(io, notificationData.userID, newNotification)
+            console.log(data);
+
+            return data
         } catch (error: any) {
             throw new Error("Failed to create comment(s)");
         }
@@ -71,11 +74,29 @@ export class Comment {
                 .sort({ createdAt: -1 }) // newest first
                 .limit(5);
 
-            console.log(comments);
             return comments;
         } catch (error: any) {
             console.error("Error in getByPost:", error);
             throw new Error("Failed to fetch comments");
+        }
+    }
+
+    static async getByID(commentID: string): Promise<CommentType | null> {
+        if (!commentID) {
+            throw new Error("Comment ID is required");
+        }
+
+        try {
+            const comment = await CommentModel.findById(commentID);
+
+            if (!comment) {
+                throw new Error("Comment not found");
+            }
+
+            return comment;
+        } catch (error: any) {
+            console.error("Error in getByID:", error);
+            throw new Error("Failed to fetch comment by ID");
         }
     }
 

@@ -78,6 +78,9 @@ class Post {
                     $sort: { createdAt: -1 }
                 },
                 {
+                    $limit: 10
+                },
+                {
                     $lookup: {
                         from: "likes",
                         let: { postIdStr: { $toString: "$_id" } },
@@ -107,6 +110,7 @@ class Post {
                     }
                 }
             ]);
+
 
             const populated = await PostModel.populate(posts, {
                 path: "shared.post",

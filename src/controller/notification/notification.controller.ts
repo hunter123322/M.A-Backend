@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import type { JWTPayload } from "../../types/jtw.payload.type";
 import { NotificationService } from "../../service/notification/notification.service";
 import type { NotificationType } from "../../types/notificaton/notification.type";
+import Post from "../../service/post/post.service";
+import { Comment } from "../../service/post/comment.service";
 
-type AuthRequest<T = any> = Request<{ id?: string }, unknown, T> & {
+type AuthRequest<T = any, U = any> = Request<{ id?: string }, U, T> & {
     user?: JWTPayload;
 };
 
@@ -46,28 +48,56 @@ export class NotificationController {
         }
     }
 
-    static async updateOne(req: AuthRequest, res: Response) {
+    static async read(req: AuthRequest<NotificationType>, res: Response) {
         try {
-            const { id } = req.params;
-            const updates = req.body;
-            if (!id) {
-                res.status(400).json({ message: "Missing notification ID" });
-                return
+            const data = req.body;
+
+            if (!data?._id) {
+                res.status(400).json({ message: "Notification ID is required" });
+                return;
             }
 
-            const updated = await NotificationService.updateOne(id, updates);
-            res.status(200).json(updated);
+            await NotificationService.markAsRead(data._id);
+
+            const { categories, engagementID } = data;
+            const postRelated = ["post", "postMention", "like"];
+            const commentRelated = ["comment"];
+
+            if (postRelated.includes(categories)) {
+                const post = await Post.findById(engagementID);
+                res.status(200).json(post);
+                return;
+            }
+
+            if (commentRelated.includes(categories)) {
+                const comment = await Comment.getByID(engagementID);
+                if (!comment || !comment.postID) {
+                    res.status(404).json({ message: "Comment or linked post not found" });
+                    return;
+                }
+
+                const post = await Post.findById(comment.postID);
+                res.status(200).json({ comment, post });
+                return;
+            }
+
+            if (categories === "system" || categories === "follow") {
+                res.status(200).json({ message: "Notification marked as read" });
+                return;
+            }
+
+            res.status(400).json({ message: "Unknown notification category" });
         } catch (error) {
             console.error("Error updating notification:", error);
             res.status(500).json({ message: "Failed to update notification" });
         }
     }
 
-    static async updateMany(req: AuthRequest, res: Response) {
+
+    static async markAllAsRead(req: AuthRequest, res: Response) {
         try {
-            const filter = req.body.filter || {};
-            const updates = req.body.updates || {};
-            const updated = await NotificationService.updateMany(filter, updates);
+            const notificationID = req.body.ID || ""
+            const updated = await NotificationService.markAllAsRead(notificationID);
             res.status(200).json(updated);
         } catch (error) {
             console.error("Error updating many notifications:", error);
@@ -75,6 +105,7 @@ export class NotificationController {
         }
     }
 
+    // TODO: Need to refactor that every 2months will delete notification 2months old
     static async delete(req: AuthRequest, res: Response) {
         try {
             const { id } = req.params;
@@ -82,7 +113,6 @@ export class NotificationController {
                 res.status(400).json({ message: "Missing notification ID" });
                 return
             }
-
             await NotificationService.delete(id);
             res.status(200).json({ message: "Notification deleted successfully" });
         } catch (error) {

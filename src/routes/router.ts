@@ -13,6 +13,8 @@ import { PostController } from "../controller/post/post.controller.js";
 import { CommentController } from "../controller/post/comment.controller.js";
 import { LikeController } from "../controller/post/like.controller.js";
 import { NotificationController } from "../controller/notification/notification.controller.js";
+import { UserController } from "../controller/user.controller.js";
+import { Search } from "../controller/user/search.user.controller.js";
 
 const router = express.Router();
 
@@ -45,6 +47,10 @@ router.post("/post/like", authenticateToken, LikeController.like)
 router.post("/post/unlike", authenticateToken, LikeController.unlike)
 
 router.get("/notification/init", authenticateToken, NotificationController.init)
+router.post("/notification/read/one", authenticateToken, NotificationController.read)
+router.post("/notification/read/all", authenticateToken, NotificationController.markAllAsRead)
+
+router.get("/search/user", authenticateToken, Search.user)
 
 
 

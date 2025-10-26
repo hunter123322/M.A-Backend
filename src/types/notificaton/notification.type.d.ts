@@ -4,7 +4,7 @@ export type NotificationType = {
     _id?: string;
     userID: number;
     engagementID: string
-    categories: "post" | "mention" | "like" | "follow" | "comment" | "system";
+    categories: "post" | "postMention" | "commentMention" | "like" | "follow" | "comment" | "system";
     content: string;
     read: boolean;
     actor?: User

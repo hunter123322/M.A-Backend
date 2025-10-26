@@ -13,7 +13,7 @@ export class NotificationService {
             return doc;
         } catch (error) {
             console.log(error);
-            
+
             throw new Error("Failed to create notification");
         }
     }
@@ -54,36 +54,37 @@ export class NotificationService {
     }
 
     // Update a single notification (e.g., mark as read)
-    static async updateOne(ID: string, updateData: Partial<NotificationType>) {
+    static async markAsRead(ID: string) {
         try {
             const result = await NotificationModel.updateOne(
                 { _id: ID },
-                { $set: updateData }
+                { $set: { read: true } }
             );
 
             if (result.matchedCount === 0)
-                throw new Error("Notification not found to update");
+                throw new Error("Notification not found to mark as read");
 
-            return result;
+            return result.upsertedId;
         } catch (error) {
-            throw new Error("Failed to update notification");
+            throw new Error("Failed to mark notification as read");
         }
     }
 
-    // Update multiple notifications (e.g., mark all read for a user)
-    static async updateMany(filter: Record<string, any>, updateData: Partial<NotificationType>) {
+    // Mark all notifications as read for a specific user
+    static async markAllAsRead(userID: string) {
         try {
             const result = await NotificationModel.updateMany(
-                filter,
-                { $set: updateData }
+                { userID },
+                { $set: { read: true } }
             );
 
             if (result.matchedCount === 0)
-                throw new Error("No notifications found to update");
+                throw new Error("No notifications found to mark as read");
 
             return result;
         } catch (error) {
-            throw new Error("Failed to update multiple notifications");
+            throw new Error("Failed to mark multiple notifications as read");
         }
     }
+
 }
