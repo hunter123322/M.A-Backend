@@ -51,6 +51,9 @@ export class NotificationController {
     static async read(req: AuthRequest<NotificationType>, res: Response) {
         try {
             const data = req.body;
+            const userID = req.user?.user_id
+            console.log(data._id);
+            
 
             if (!data?._id) {
                 res.status(400).json({ message: "Notification ID is required" });
@@ -76,7 +79,7 @@ export class NotificationController {
                     return;
                 }
 
-                const post = await Post.findById(comment.postID);
+                const post = await Post.findById(comment.postID, userID);
                 res.status(200).json({ comment, post });
                 return;
             }

@@ -7,6 +7,7 @@ import { IMessageDocument } from "../model/message/messages.model";
 import type { UserInfo, UserLocation, UserAut, UserProfile } from "../types/User.type";
 import Post from "../service/post/post.service";
 import { isTypedArray } from "util/types";
+import { NotificationService } from "../service/notification/notification.service";
 
 const user = new UserModel(mySQLConnectionPool);
 
@@ -46,11 +47,17 @@ export class UserController {
     await this.transaction.locationCredential(data, user_id);
   }
 
-  public async initProfile(userID: number) {
+  public async initProfile(userID: number, myProfile: boolean = false) {
     const userProfileData = await this.transaction.fetchUserProfile(userID) as UserProfile;
 
     // Fetch the user post data in MongoDB
     const myPosts = await Post.findByUser(userID)
+
+    // Fetch the Notification (min 50)
+    if (myProfile) {
+      const notifications = await NotificationService.init(userID)
+      return { userProfileData, myPosts, notifications }
+    }
 
     return { userProfileData, myPosts }
   }

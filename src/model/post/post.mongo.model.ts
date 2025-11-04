@@ -13,10 +13,18 @@ export const userSubSchema = new Schema<User>(
     { _id: false }
 );
 
+export const imageSubSchema = new Schema(
+    {
+        key: { type: String, required: true },
+        mimeType: { type: String, required: true }
+    },
+    { _id: false }
+)
+
 const postSchema = new Schema<PostMongoDoc>(
     {
         author: { type: userSubSchema, required: true },
-        imageUrl: { type: String, trim: true },
+        imageUrl: { type: imageSubSchema },
         caption: { type: String, trim: true },
         likes: { type: Number, default: 0, min: 0 },
         shared: {

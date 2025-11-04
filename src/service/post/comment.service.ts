@@ -1,7 +1,6 @@
-import { io } from "../../app";
+import axios from "axios";
 import { CommentModel } from "../../model/post/comment.mongo.model";
 import { PostModel } from "../../model/post/post.mongo.model";
-import { sendNotification } from "../../socket/event/message.event";
 import type { CommentType } from "../../types/post/comment.type";
 import { NotificationService } from "../notification/notification.service";
 export class Comment {
@@ -20,23 +19,31 @@ export class Comment {
             if (!updatedPostDOc || !updatedPostDOc.author || !updatedPostDOc.author.id) {
                 throw new Error("Updated post not found or missing author — skipping notification");
             }
-            if (updatedPostDOc.author.id === commentData.author.id) {
-                console.info("User liked their own post — skipping notification");
-                return data;
-            }
+
+            // if (updatedPostDOc.author.id === commentData.author.id) {
+            //     // console.info("User liked their own post — skipping notification");
+            //     return data;
+            // }
 
             const notificationData = {
                 userID: updatedPostDOc.author.id,
-                engagementID: updatedPostDOc._id,
-                categories: "like" as "like",
+                engagementID: data._id,
+                actor: commentData.author,
+                categories: "comment" as "comment",
                 content: "",
                 read: false
             };
 
             const newNotification = await NotificationService.create(notificationData);
 
-            sendNotification(io, notificationData.userID, newNotification)
-            console.log(data);
+            await axios.post("http://localhost:3001/internal/notify",
+                { notificationData, newNotification },
+                {
+                    headers: {
+                        "x-api-key": process.env.INTERNAL_API_KEY,
+                    },
+                }
+            );
 
             return data
         } catch (error: any) {

@@ -1,11 +1,9 @@
-import { io } from "../../app";
-import mongoDBconnection from "../../db/mongodb/mongodb.connection";
 import { LikeModel } from "../../model/post/like.mongo.model";
 import { PostModel } from "../../model/post/post.mongo.model";
-import { sendNotification } from "../../socket/event/message.event";
 import type { LikeData } from "../../types/post/like.type";
 import { NotificationService } from "../notification/notification.service";
 import type { User } from "../../types/User.type";
+import axios from "axios"
 
 export class Like {
     static async like(likeData: LikeData, author?: User): Promise<void> {
@@ -40,7 +38,14 @@ export class Like {
             const newNotification = await NotificationService.create(notificationData);
             // TODO Emit using the sooket
 
-            sendNotification(io, notificationData.userID, newNotification)
+            await axios.post("http://localhost:3001/internal/notify",
+                { notificationData, newNotification },
+                {
+                    headers: {
+                        "x-api-key": process.env.INTERNAL_API_KEY,
+                    },
+                }
+            );
         } catch (error: any) {
             console.log(error);
             throw new Error("Failed to like the post");

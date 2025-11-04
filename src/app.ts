@@ -2,16 +2,13 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import { createServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
 // Local imports
 import mongoDBconnection from "./db/mongodb/mongodb.connection.js";
 import router from "./routes/router.js";
-import handleSocketConnection from "./socket/socket.server.js";
 import { setSecurityHeaders } from "./middleware/security.headers.js";
-import { authenticateTokenSocket } from "./middleware/authentication.js";
 
 dotenv.config();
 
@@ -24,7 +21,6 @@ const server = createServer(app);
 // ================== MIDDLEWARE ==================
 app.use(cookieParser());
 app.use(setSecurityHeaders);
-app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -32,25 +28,14 @@ app.use(
     credentials: true,
   })
 );
-
-
-// ================== SOCKET.IO ==================
-export const io = new SocketIOServer(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+app.use((req, res, next) => {
+  if (req.is("multipart/form-data")) return next();
+  express.json()(req, res, next);
 });
-
-// ✅ Apply single JWT middleware for sockets
-io.use(authenticateTokenSocket);
 
 // ================== ROUTES ==================
 app.use(router);
 
-// ================== SOCKET HANDLERS ==================
-handleSocketConnection(io);
 
 // ================== START SERVER ==================
 server.listen(PORT, () => {

@@ -45,7 +45,7 @@ export class PostController {
                 return;
             }
 
-            const posts = await Post.findByTimestamp(timestamp);
+            const posts = await Post.findByTimestamp(timestamp, 1);
             res.status(200).json({ data: posts });
         } catch (error: any) {
             console.error("❌ Get Posts by Timestamp Error:", error);
@@ -55,12 +55,17 @@ export class PostController {
 
     static async create(req: AuthRequest, res: Response): Promise<void> {
         try {
-            const user_id = req.user?.user_id;
-            const postData = req.body as PostData;
+            const file = req.file;
+            const { author, caption } = req.body
 
-            if (!user_id) {
-                res.status(401).json({ message: "Unauthorized" });
-                return;
+            const postData = {
+                author: JSON.parse(author),
+                caption: caption
+            }
+
+            if (!file) {
+                res.status(400).json({ message: "No file uploaded" });
+                return
             }
 
             if (!postData) {
@@ -68,7 +73,7 @@ export class PostController {
                 return;
             }
 
-            const postDone = await Post.create(postData);
+            const postDone = await Post.create(postData, file);
             res.status(201).json(postDone);
         } catch (error: any) {
             res.status(500).json({ message: "Failed to create post" });
@@ -77,13 +82,7 @@ export class PostController {
 
     static async share(req: AuthRequest, res: Response): Promise<void> {
         try {
-            const user_id = req.user?.user_id;
-            const postData = req.body as PostData;
-
-            if (!user_id) {
-                res.status(401).json({ message: "Unauthorized" });
-                return;
-            }
+            const postData = req.body;
 
             if (!postData) {
                 res.status(400).json({ message: "Invalid post data" });
@@ -93,6 +92,7 @@ export class PostController {
             const postDone = await Post.share(postData);
             res.status(201).json(postDone);
         } catch (error: any) {
+            console.error("Error", error);
             res.status(500).json({ message: "Failed to create post" });
         }
     }
@@ -150,6 +150,40 @@ export class PostController {
         } catch (error: any) {
             console.error("❌ Post Deletion Error:", error);
             res.status(500).json({ message: "Failed to delete post" });
+        }
+    }
+
+    static async feedInit(req: AuthRequest, res: Response) {
+        try {
+            const id = req.query.id;
+            const category = req.query.categories as string
+            const categories = category.slice(1, -1).split(',') as any
+
+            console.log(req.query, categories);
+            
+            const post = await Post.init(Number(id), categories);
+            if (!post || post.length === 0) {
+                res.status(400).json({ message: "Retry" })
+                return
+            }
+            res.status(200).json(post)
+        } catch (error) {
+            res.status(500).json({ message: "something went wrong" })
+        }
+    }
+
+    static async findByUser(req: AuthRequest, res: Response) {
+        try {
+            const userID = req.query.id as string
+            if (!userID) {
+                res.status(400).json({ message: "User ID is empty" });
+                return
+            }
+            const posts = await Post.findByUser(Number(userID))
+
+            res.status(200).json(posts)
+        } catch (error) {
+            res.status(500).json({ message: "something went wrong" })
         }
     }
 }

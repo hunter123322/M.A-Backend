@@ -3,6 +3,7 @@ import mySQLConnectionPool from "../../db/mysql/mysql.connection-pool.js";
 import { UserController } from "../user.controller.js";
 import type { UserAut } from "../../types/User.type.js";
 import { generateToken } from "../../middleware/auth.middleware.js";
+import Post from "../../service/post/post.service.js";
 
 
 async function postLogin(req: Request, res: Response): Promise<void> {
@@ -17,8 +18,12 @@ async function postLogin(req: Request, res: Response): Promise<void> {
     }
 
     const data = await User.loginController(userData);
+    if(!data){
+      res.status(500).json({message: "Try Again"})
+      return
+    }
 
-    const userProfile = await User.initProfile(data.user_id)
+    const userProfile = await User.initProfile(data.user_id, true)
 
 
     const author = {
@@ -40,7 +45,7 @@ async function postLogin(req: Request, res: Response): Promise<void> {
       user_id: data.user_id,
       messages: data.messages,
       userInfo: data.authentication,
-      userProfile: userProfile
+      userProfile: userProfile,
     });
   } catch (error: any) {
     res.status(404).json({ error: error.message });

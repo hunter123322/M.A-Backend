@@ -1,9 +1,15 @@
 import { PostData } from "../../../types/post/post.type";
+import { User } from "../../../types/User.type";
 import { postCategories, prepositions } from "./postCategory";
 
-
+type RawPostData = {
+    author: User;
+    caption: string;
+    tags?: string[];
+    aiScore?: Object
+}
 export class Filter {
-    static post(postData: PostData) {
+    static post(postData: RawPostData) {
         const prepositionsSet = new Set(prepositions);
 
         if (!postData.caption) return postData;

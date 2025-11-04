@@ -3,9 +3,6 @@ import { IReaction } from "../../types/message.type";
 import type { IMessage } from "../../types/message.type";
 import type { User } from "../../types/User.type";
 
-
-
-
 const reactionSchema = new Schema<IReaction>({
   userID: { type: Number, required: true },
   emoji: { type: String }
@@ -17,9 +14,9 @@ export interface IMessageDocument extends IMessage, Document {
 
 const userSubSchema = new Schema<User>(
   {
-    id: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
-    avatarUrl: { type: String, required: true, trim: true },
+    id: { type: Number, required: true, trim: true },
+    username: { type: String, required: true, trim: true },
+    avatarUrl: { type: Number, required: true, trim: true },
   },
   { _id: false }
 );

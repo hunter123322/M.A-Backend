@@ -55,6 +55,7 @@ export class NotificationService {
 
     // Update a single notification (e.g., mark as read)
     static async markAsRead(ID: string) {
+        console.log(ID)
         try {
             const result = await NotificationModel.updateOne(
                 { _id: ID },

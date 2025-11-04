@@ -37,24 +37,3 @@ export const generateToken = (payload: JWTPayload): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
-
-export const authenticateTokenSocket = (
-  socket: Socket,
-  next: (err?: Error) => void
-): void => {
-  const token =
-    (socket.handshake.auth?.token as string) ||
-    (socket.handshake.headers?.authorization?.split(" ")[1] as string);
-
-  if (!token) {
-    return next(new Error("Authentication error: token required"));
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
-    (socket as any).user = decoded; // Attach user payload
-    next();
-  } catch (error) {
-    return next(new Error("Authentication error: invalid token"));
-  }
-};

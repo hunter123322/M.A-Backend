@@ -25,7 +25,7 @@ export class LikeController {
             const author = req.user?.author
             await Like.like(likeData, author);
 
-            res.status(201);
+            res.status(201).json({ message: "OK" });
         } catch (error: any) {
             if (error) console.log(error.message);
             res.status(500).json({ message: "Failed to Like" });
@@ -45,8 +45,7 @@ export class LikeController {
             }
 
             await Like.unlike(likeData);
-
-            res.status(201);
+            res.status(201).json({ message: "OK" });
         } catch (error: any) {
             if (error) console.log(error.message);
             res.status(500).json({ message: "Failed to unlike" });
